@@ -17,11 +17,15 @@ const client = mqtt.connect(url, options);
 client.on("connect", function () {
   console.log("เชื่อมต่อ mqtt สำเร็จ");
   console.log("เชื่อมต่อ mqtt สำเร็จ");
-  console.log(`ส่งข้อมูลจากอุปกรณ์ ไปยัง SERVICES แล้ว ✔️ `);
+  console.log(`ส่งข้อมูลจากอุปกรณ์ ไปยัง server แล้ว ✔️ `);
   setInterval(() => {
-    const tem_val = (Math.random() * 100).toFixed(2);
-    const speed_val = (Math.random() * 100).toFixed(2);
-    const brightness_val = (Math.random() * 10000).toFixed(2);
+    let tem_val = (Math.random() * 100).toFixed(2);
+    tem_val = map(tem_val, 0, 100, 23, 26).toFixed(2);
+    let speed_val = (Math.random() * 100).toFixed(2);
+    speed_val= map(speed_val, 0, 10000, 2000, 2500).toFixed(0);
+    let brightness_val = (Math.random() * 10000).toFixed(0);
+     brightness_val = map(brightness_val, 0, 10000, 500, 1200).toFixed(0);
+
     client.publish(
       "65f82cdd1cc452b51386c307/home-1/publish",
       JSON.stringify({
@@ -34,7 +38,7 @@ client.on("connect", function () {
         retain: false,
       }
     );
-  }, 1000);
+  }, 2500);
 
   setInterval(() => {
     client.subscribe(
@@ -63,8 +67,11 @@ client.on("message", function (topic, message) {
   if (payload.led === 0) {
     console.log("ไฟกลางห้องถูกปิด ❌");
   }
-  if (payload["brightness-bedroom"]) {
-    console.log("ความสว่างในห้อง ", payload["brightness-bedroom"], " %");
+  if (payload["brightness-bedroom"] > 0) {
+    console.log("ความสว่างไฟหัวเตียง ", payload["brightness-bedroom"], "%");
+  }
+  if (payload["brightness-bedroom"] < 1) {
+    console.log("ความสว่างในห้อง 0 %");
   }
   console.log("--------------------------------");
 });
@@ -76,3 +83,6 @@ client.on("disconnect", function (topic, message) {
 client.on("reconnect", function (topic, message) {
   console.log("อุปกรณ์ reconnect");
 });
+const map = (x, in_min, in_max, out_min, out_max) => {
+  return ((x - in_min) * (out_max - out_min)) / (in_max - in_min) + out_min;
+};
