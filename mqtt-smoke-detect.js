@@ -1,15 +1,14 @@
 const mqtt = require("mqtt");
 console.log("เริ่มต้น mqtt client");
 
-const url = "ws://localhost:8083/mqtt";
+const url = "mqtt://localhost:1883";
 
 const options = {
   connectTimeout: 4000,
-  clientId: "TestMQTT2",
-  username: "npru",
-  password: "1234",
-  protocol: "ws",
-  clean: true,
+  clientId: "342423423432df23",
+  username: "device-smoke",
+  password: "device-smoke",
+  // clean: true,
   reconnectPeriod: 5000,
 };
 const client = mqtt.connect(url, options);
@@ -17,25 +16,29 @@ const client = mqtt.connect(url, options);
 client.on("connect", function () {
   console.log("เชื่อมต่อ mqtt สำเร็จ");
   console.log("เชื่อมต่อ mqtt สำเร็จ");
-  console.log(`ส่งข้อมูลจากอุปกรณ์ ไปยัง SERVICES แล้ว ✔️ `);
+  let number = 0;
   setInterval(() => {
+    console.log(`ส่งข้อมูลจากอุปกรณ์ ไปยัง Broker แล้ว ✔️ `);
     const random = (Math.random() * 10).toFixed(0) - 1;
     // console.log(random);
     client.publish(
-      "65f82cdd1cc452b51386c307/com1/publish",
+      "66e3bda018e1a3bf3f64ad6c/device-smoke/publish",
       JSON.stringify({
-        "1-floor": random == 1 ? "ตรวจพบ 🟢" : "ไม่ตรวจพบ 🔴",
-        "2-floor": random == 2 ? "ตรวจพบ 🟢" : "ไม่ตรวจพบ 🔴",
-        "3-floor": random == 3 ? "ตรวจพบ 🟢" : "ไม่ตรวจพบ 🔴",
-        "4-floor": random == 4 ? "ตรวจพบ 🟢" : "ไม่ตรวจพบ 🔴",
-        "5-floor": random == 5 ? "ตรวจพบ 🟢" : "ไม่ตรวจพบ 🔴",
+        "floor-1": random == 1 ? "ตรวจพบ 🟢" : "ไม่ตรวจพบ 🔴",
+        "floor-2": random == 2 ? "ตรวจพบ 🟢" : "ไม่ตรวจพบ 🔴",
+        "floor-3": random == 3 ? "ตรวจพบ 🟢" : "ไม่ตรวจพบ 🔴",
+        "floor-4": random == 4 ? "ตรวจพบ 🟢" : "ไม่ตรวจพบ 🔴",
+        "floor-5": random == 5 ? "ตรวจพบ 🟢" : "ไม่ตรวจพบ 🔴",
+        "total-detection": number,
+        "current-date": new Date(Date.now()).toUTCString(),
       }),
       {
-        qos: 2,
-        retain: true,
+        qos: 0,
+        // retain: true,
       }
     );
-  }, 5000);
+    number += 1;
+  }, 2000);
 });
 
 // Receive messages
